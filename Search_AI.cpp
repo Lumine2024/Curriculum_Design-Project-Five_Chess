@@ -1,36 +1,21 @@
 #include "Search_AI.h"
 #include<unordered_map>
 using namespace std;
-struct VectorCharHash {
-	std::size_t operator()(const std::vector<char> &v) const {
-		std::size_t hash = 0;
-		for(char c : v) {
-			hash ^= std::hash<char>{}(c) +0x9e3779b9 + (hash << 6) + (hash >> 2);
-		}
-		return hash;
-	}
-};
-struct VectorCharEqual {
-	bool operator()(const std::vector<char> &v1, const std::vector<char> &v2) const {
-		return v1 == v2;
-	}
-};
-
 using score_t = unsigned long long;
-
 score_t ScoreRefToCnt(int cnt) {
 	switch(cnt) {
 		case 0:return 1;
-		case 1:return 100;
-		case 2:return 100000;
-		case 3:return 1000000000;
+		case 1:return 10;
+		case 2:return 10000;
+		case 3:return 1000000ULL;
 		case 4:return 100000000000ULL;
+		default:__assume(false);
 	}
 }
-
 void Search_AI::judge(const Five_Chess& fc) {
+	max_of_judgement = 0;
 	auto spaces = fc.generate_possible_moves();
-	judgement = vector<vector<score_t>>(15, vector<score_t>(15, 1));
+	judgement = vector<vector<score_t>>(15, vector<score_t>(15, 0));
 	for(auto &space : spaces) {
 		auto x = space.first, y = space.second;
 		for(int i = 0; i < 4; ++i) {
@@ -50,7 +35,10 @@ void Search_AI::judge(const Five_Chess& fc) {
 					}
 					else break;
 				}
-				else break;
+				else {
+					righthasblock = 1;
+					break;
+				}
 			}
 			if(x - dx < 0 || y - dy < 0 || x - dx > 14 || y - dy > 14) leftcnt = 0;
 			else if(fc.chessboard[x - dx][y - dy] == ' ') leftcnt = 0;
@@ -66,64 +54,66 @@ void Search_AI::judge(const Five_Chess& fc) {
 					}
 					else break;
 				}
-				else break;
+				else {
+					lefthasblock = 1;
+					break;
+				}
 			}
-			judgement[x][y] += (lefthasblock ? 0.4 : 1) * ScoreRefToCnt(leftcnt);
-			judgement[x][y] += (righthasblock ? 0.4 : 1) * ScoreRefToCnt(rightcnt);
+			judgement[x][y] += (leftcnt == 0 ? 1 : (lefthasblock ? 0.4 : 1) * ScoreRefToCnt(leftcnt)) * (rightcnt == 0 ? 1 : (righthasblock ? 0.4 : 1) * ScoreRefToCnt(rightcnt));
 		}
+		max_of_judgement = max(max_of_judgement, judgement[x][y]);
 	}
 }
-
-void Search_AI::put(Five_Chess& fc) {
-	int a = -1, b = -1;
+unsigned long long Search_AI::put(Five_Chess &fc, int depth) {
+	judge(fc);
+	unordered_map<int, int> ht;
+	if(depth >= maxdepth) {
+		score_t best_score = 0ULL;
+		for(int i = 0; i < 15; ++i) {
+			for(int j = 0; j < 15; ++j) {
+				if(judgement[i][j] == max_of_judgement) {
+					fc.putchess(i, j);
+					judge(fc);
+					best_score = max(best_score, max_of_judgement);
+					fc.rmchess(i, j);
+				}
+			}
+		}
+		return best_score;
+	}
+	for(int i = 0; i < 15; ++i) {
+		for(int j = 0; j < 15; ++j) {
+			if(judgement[i][j] == max_of_judgement) {
+				ht[i] = j;
+			}
+		}
+	}
+	if(ht.size() == 1) {
+		auto [i, j] = *(ht.begin());
+		fc.putchess(i, j);
+		judge(fc);
+		auto ret = max_of_judgement;
+		if(depth != 0) fc.rmchess(i, j);
+		return ret;
+	}
+	int _x = -1, _y = -1;
 	unsigned long long maxn = 0;
-	unordered_map<int, int> hash;
-	for(int i = 0; i < 15; ++i) {
-		for(int j = 0; j < 15; ++j) {
-			maxn = max(maxn, judgement[i][j]);
-		}
-	}
-	for(int i = 0; i < 15; ++i) {
-		for(int j = 0; j < 15; ++j) {
-			if(judgement[i][j] == maxn) {
-				hash[i] = j;
-			}
-		}
-	}
-	if(hash.size() == 1) {
-		for(auto &elem : hash) {
-			a = elem.first;
-			b = elem.second;
-			fc.putchess(a, b);
-			return;
-		}
-	}
-	else for(auto &elem : hash) {
-		a = elem.first;
-		b = elem.second;
-		try {
-			fc.putchess(a, b);
-		}
-		catch(...) {
-			continue;
-		}
+	for(auto hashes : ht) {
+		auto [i, j] = hashes;
+		fc.putchess(i, j);
 		judge(fc);
-		for(int i = 0; i < 15; ++i) {
-			for(int j = 0; j < 15; ++j) {
-				if(judgement[i][j] > maxn) {
-					maxn = judgement[i][j];
-				}
-			}
+		auto retthis = put(fc, depth + 1);
+		if(maxn < retthis) {
+			maxn = retthis;
+			_x = i, _y = j;
 		}
-		for(int i = 0; i < 15; ++i) {
-			for(int j = 0; j < 15; ++j) {
-				if(judgement[i][j] == maxn) {
-					return;
-				}
-			}
-		}
-		fc.rmchess(a, b);
-		judge(fc);
+		fc.rmchess(i, j);
 	}
-	fc.putchess(a, b);
+	if(depth == 0) {
+		fc.putchess(_x, _y);
+		return static_cast<unsigned long long>(-1);
+	}
+	else {
+		return maxn;
+	}
 }

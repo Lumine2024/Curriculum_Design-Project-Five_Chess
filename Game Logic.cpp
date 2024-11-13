@@ -18,6 +18,10 @@ void Five_Chess::rmchess(int x, int y) {
 }
 
 bool Five_Chess::has_ended(char &ch) {
+	if(generate_possible_moves().empty()) {
+		ch = '3';
+		return true;
+	}
 	for(int i = 0; i < 15; ++i) {
 		for(int j = 0; j < 11; ++j) {
 			if(chessboard[i][j] == chessboard[i][j + 1] && chessboard[i][j + 1] == chessboard[i][j + 2] && chessboard[i][j + 2] == chessboard[i][j + 3] && chessboard[i][j + 3] == chessboard[i][j + 4] && chessboard[i][j] != ' ') {

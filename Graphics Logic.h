@@ -1,6 +1,4 @@
 #pragma once
-#ifndef GRAPHICS_LOGIC_H
-#define GRAPHICS_LOGIC_H
 #include<Windows.h>
 #include<graphics.h>
 #include"Game Logic.h"
@@ -14,6 +12,5 @@ int menu();
 const MOUSEMSG no_msg = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 void printboard(const Five_Chess &game, const MOUSEMSG& msg = no_msg);
 void putchess(Five_Chess &game, MOUSEMSG& msg);
-void options();
+void options(int &aichoice);
 bool side();
-#endif // GRAPHICS_LOGIC_H

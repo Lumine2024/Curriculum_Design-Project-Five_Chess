@@ -12,11 +12,12 @@ Occupied::Occupied() {
 	settextstyle(50, 0, _T("良怀行书"));
 	settextcolor(RED);
 	outtextxy(50, 275, _T("该位置已被占用，请重新选择！"));
+	FlushBatchDraw();
 	Sleep(500);
 }
 
 
-void printboard(const Five_Chess &game, const MOUSEMSG& msg) {
+void printboard(const Five_Chess &game, const MOUSEMSG &msg) {
 	cleardevice();
 	setlinecolor(BLACK);
 	for(int i = 0; i < 15; ++i) {
@@ -40,12 +41,13 @@ void printboard(const Five_Chess &game, const MOUSEMSG& msg) {
 			}
 		}
 	}
+	if(msg.x < 5 && msg.y < 5) return;
 	int _x = (msg.x - 25) / 40, _y = (msg.y - 25) / 40;
 	if(_x >= 0 && _x < 15 && _y >= 0 && _y < 15 && game.chessboard[_x][_y] == ' ') {
 		int x = 50 + _x * 40;
 		int y = 50 + _y * 40;
-		if(game.is_index_0_player_playing) setfillcolor(RGB(120, 120, 120));
-		else setfillcolor(RGB(30, 30, 30));
+		if(game.is_index_0_player_playing) setfillcolor(LIGHTGRAY);
+		else setfillcolor(DARKGRAY);
 		solidcircle(x, y, 15);
 	}
 }
@@ -114,13 +116,21 @@ int menu() {
 	buttons.push_back(Button(280, 390, 120, 50, _T("AI自动战斗")));
 	buttons.push_back(Button(280, 460, 120, 50, _T("选项")));
 	buttons.push_back(Button(280, 530, 120, 50, _T("退出游戏")));
+	buttons.push_back(Button(50, 600, 200, 50, _T("打开工程文件debug")));
 	return multibutton(buttons);
 }
 bool music_playing = true;
-void options() {
+void chooseAI(int &aichoice) {
+	vector<Button> buttons;
+	buttons.push_back(Button(240, 250, 200, 50, _T("Alpha_Beta搜索AI")));
+	buttons.push_back(Button(240, 350, 200, 50, _T("线性搜索AI")));
+	aichoice = multibutton(buttons);
+}
+void options(int &aichoice) {
 	vector<Button> buttons;
 	buttons.push_back(Button(240, 250, 200, 50, _T("是否播放音乐")));
-	buttons.push_back(Button(240, 350, 200, 50, _T("返回")));
+	buttons.push_back(Button(240, 350, 200, 50, _T("选择AI")));
+	buttons.push_back(Button(240, 450, 200, 50, _T("返回")));
 	while(true) {
 		int choice = multibutton(buttons);
 		if(choice == 0) {
@@ -131,6 +141,9 @@ void options() {
 			else {
 				mciSendString(_T("stop bgm"), NULL, 0, NULL);
 			}
+		}
+		else if(choice == 1) {
+			chooseAI(aichoice);
 		}
 		else return;
 	}
