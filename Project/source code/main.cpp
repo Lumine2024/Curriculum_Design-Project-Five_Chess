@@ -1,6 +1,7 @@
-#ifdef _MSC_VER
-#include <yvals_core.h>
+#ifndef _MSC_VER
+#error must be used in MSVC compiler.
 #endif
+#include <yvals_core.h>
 #if !_HAS_CXX17 && __cplusplus < 201703L
 #error C++17 is required.
 #endif
@@ -9,47 +10,47 @@
 #include"Search_AI.h"
 #pragma comment(lib,"winmm.lib")
 using namespace std;
-// ÈËÀà²Ù×÷
+// äººç±»æ“ä½œ
 class Human : public Player_Base {
 public:
 	Human() = default;
-	// ÈËÀàµÄÅĞ¶Ï¿ÉÓÉÈËÀà×ÔĞĞÍê³É
+	// äººç±»çš„åˆ¤æ–­å¯ç”±äººç±»è‡ªè¡Œå®Œæˆ
 	void judge(const Five_Chess &fc) {}
-	// »ñÈ¡Êó±êĞÅÏ¢£¬µã»÷Ê±Âä×Ó
+	// è·å–é¼ æ ‡ä¿¡æ¯ï¼Œç‚¹å‡»æ—¶è½å­
 	void put(Five_Chess &fc) {
 		while(true) {
-			// »ñÈ¡Êó±êĞÅÏ¢
+			// è·å–é¼ æ ‡ä¿¡æ¯
 			MOUSEMSG msg = GetMouseMsg();
-			// Ã»ÓĞµã»÷×ó¼üµÄÊ±ºò²»¶Ï»ñÈ¡Êó±êĞÅÏ¢
+			// æ²¡æœ‰ç‚¹å‡»å·¦é”®çš„æ—¶å€™ä¸æ–­è·å–é¼ æ ‡ä¿¡æ¯
 			while(msg.uMsg != WM_LBUTTONDOWN) {
 				msg = GetMouseMsg();
 				printboard(fc, msg);
 			}
-			// ³¢ÊÔÔÚ°´ÏÂ×ó¼üµÄµØ·½Âä×Ó
+			// å°è¯•åœ¨æŒ‰ä¸‹å·¦é”®çš„åœ°æ–¹è½å­
 			try {
 				putchess(fc, msg);
-				// ³É¹¦Âä×Ó£¬ÍË³öÑ­»·
+				// æˆåŠŸè½å­ï¼Œé€€å‡ºå¾ªç¯
 				break;
 			}
-			// Âä×ÓÊ§°Ü£¬¸ÃÎ»ÖÃ±»Õ¼ÓÃ£¬¼ÌĞøÑ­»·
+			// è½å­å¤±è´¥ï¼Œè¯¥ä½ç½®è¢«å ç”¨ï¼Œç»§ç»­å¾ªç¯
 			catch(Occupied &oc){}
 		}
 	}
 	~Human() = default;
 };
-// ½øĞĞÓÎÏ·µÄº¯Êı
-// µÚËÄ¸ö²ÎÊıÎªÂä×ÓºóÊÇ·ñµÈ´ı500ms£¬ÕâÊÇÎªÁË·ÀÖ¹AI×ÔÎÒ¶ÔŞÄÊ±Âä×Ó¹ı¿ìÎŞ·¨¿´Çå
+// è¿›è¡Œæ¸¸æˆçš„å‡½æ•°
+// ç¬¬å››ä¸ªå‚æ•°ä¸ºè½å­åæ˜¯å¦ç­‰å¾…500msï¼Œè¿™æ˜¯ä¸ºäº†é˜²æ­¢AIè‡ªæˆ‘å¯¹å¼ˆæ—¶è½å­è¿‡å¿«æ— æ³•çœ‹æ¸…
 void _playgame(Five_Chess &fc, Player_Base *player1, Player_Base *player2, bool dosleep = false) {
-	// ½øÈëÓÎÏ·Ê±´òÓ¡ÆåÅÌ
+	// è¿›å…¥æ¸¸æˆæ—¶æ‰“å°æ£‹ç›˜
 	printboard(fc);
-	// »ñÈ¡Ê¤ÀûÕßµÄ´úÀí¶ÔÏó
+	// è·å–èƒœåˆ©è€…çš„ä»£ç†å¯¹è±¡
 	char ch;
-	// ÔÚÓÎÏ·½áÊøÇ°Ñ­»·¶şÈË²Ù×÷
+	// åœ¨æ¸¸æˆç»“æŸå‰å¾ªç¯äºŒäººæ“ä½œ
 	while(!fc.has_ended(ch)) {
 		player1->judge(fc);
 		player1->put(fc);
 		printboard(fc);
-		// Èç¹ûµÚÒ»ÈËÂä×ÓºóÓÎÏ·ÒÑ¾­½áÊø£¬ÔòÖ±½ÓÍË³öÑ­»·
+		// å¦‚æœç¬¬ä¸€äººè½å­åæ¸¸æˆå·²ç»ç»“æŸï¼Œåˆ™ç›´æ¥é€€å‡ºå¾ªç¯
 		if(fc.has_ended(ch)) break;
 		if(dosleep) Sleep(500);
 		player2->judge(fc);
@@ -57,64 +58,65 @@ void _playgame(Five_Chess &fc, Player_Base *player1, Player_Base *player2, bool 
 		printboard(fc);
 		if(dosleep && !fc.has_ended(ch)) Sleep(500);
 	}
-	// ½áËã¶¯»­
+	// ç»“ç®—åŠ¨ç”»
 	settextcolor(RED);
-	settextstyle(50, 0, _T("Á¼»³ĞĞÊé"));
+	settextstyle(50, 0, _T("è‰¯æ€€è¡Œä¹¦"));
 	if(ch == '1') {
-		outtextxy(250, 220, _T("°×Æå»ñÊ¤£¡"));
+		outtextxy(250, 220, _T("ç™½æ£‹è·èƒœï¼"));
 	}
 	else if(ch == '2') {
-		outtextxy(250, 220, _T("ºÚÆå»ñÊ¤£¡"));
+		outtextxy(250, 220, _T("é»‘æ£‹è·èƒœï¼"));
 	}
 	else {
-		outtextxy(250, 220, _T("Æ½¾Ö£¡"));
+		outtextxy(250, 220, _T("å¹³å±€ï¼"));
 	}
-	// µÈ´ı1sºó·µ»ØÖ÷²Ëµ¥
+	// ç­‰å¾…1såè¿”å›ä¸»èœå•
 	Sleep(1000);
 	setlinecolor(BLACK);
 }
-// Ê¹ÓÃWinMainº¯Êı£¬Èç¹ûĞèÒª±àÒë£¬ÇëÊ¹ÓÃVisual Studio£¬´ò¿ªC++17ÒÔÉÏ±ê×¼£¬²¢ÔÚÁ´½ÓÆ÷->ÏµÍ³->×ÓÏµÍ³´¦Ñ¡Ôñ´°¿Ú/WINDOWS
+// ä½¿ç”¨WinMainå‡½æ•°ï¼Œå¦‚æœéœ€è¦ç¼–è¯‘ï¼Œè¯·ä½¿ç”¨Visual Studioï¼Œæ‰“å¼€C++17ä»¥ä¸Šæ ‡å‡†ï¼Œå¹¶åœ¨é“¾æ¥å™¨->ç³»ç»Ÿ->å­ç³»ç»Ÿå¤„é€‰æ‹©çª—å£/WINDOWS
+// ç›´æ¥ä½¿ç”¨æ ¹ç›®å½•ä¸‹çš„.slnæ–‡ä»¶å³å¯
 int WINAPI WinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrev, _In_ LPSTR cmd, _In_ int n_cmd) {
-	// ²¥·ÅBGM
+	// æ’­æ”¾BGM
 	mciSendString(_T("open ../resources/FiveChess.mp3 alias bgm"), NULL, 0, NULL);
 	mciSendString(_T("play bgm repeat"), NULL, 0, NULL);
-	// µÈ´ıBGM¿ªÊ¼²¥·Å£¨Îí£©
+	// ç­‰å¾…BGMå¼€å§‹æ’­æ”¾ï¼ˆé›¾ï¼‰
 	Sleep(1000);
-	// ÏÔÊ¾ÓÎÏ·»­Ãæ
+	// æ˜¾ç¤ºæ¸¸æˆç”»é¢
 	init();
-	// ÓÎÏ·Ñ­»·
+	// æ¸¸æˆå¾ªç¯
 	while(true) {
-		// Í¨¹ı²Ëµ¥À¸µÄ·µ»ØÖµ»ñÈ¡Íæ¼ÒÑ¡Ïî
+		// é€šè¿‡èœå•æ çš„è¿”å›å€¼è·å–ç©å®¶é€‰é¡¹
 		int choice = menu();
 		switch(choice) {
-			case 0: { // µ¥ÈËÓÎÏ·
-				int _side = side(); // Ñ¡±ß£¬0ÎªºÚ×Ó£¬1Îª°××Ó£¬2Îª·µ»Ø
+			case 0: { // å•äººæ¸¸æˆ
+				int _side = side(); // é€‰è¾¹ï¼Œ0ä¸ºé»‘å­ï¼Œ1ä¸ºç™½å­ï¼Œ2ä¸ºè¿”å›
 				Five_Chess fc;
 				Search_AI ai;
 				Human h;
-				if(_side == 2) break; // break·µ»ØÖ÷²Ëµ¥
-				else if(_side == 1) fc.putchess(7, 7); // Íæ¼ÒÑ¡Ôñ°××Ó£¬ÔÚÆåÅÌÖĞ¼äÖ±½Ó°Ú·ÅÒ»¿ÅºÚ×Ó
-				_playgame(fc, &h, &ai); // ½øĞĞÓÎÏ·
+				if(_side == 2) break; // breakè¿”å›ä¸»èœå•
+				else if(_side == 1) fc.putchess(7, 7); // ç©å®¶é€‰æ‹©ç™½å­ï¼Œåœ¨æ£‹ç›˜ä¸­é—´ç›´æ¥æ‘†æ”¾ä¸€é¢—é»‘å­
+				_playgame(fc, &h, &ai); // è¿›è¡Œæ¸¸æˆ
 				break;
 			} // case 0
-			case 1: { // Ë«ÈËÓÎÏ·
+			case 1: { // åŒäººæ¸¸æˆ
 				Five_Chess fc;
 				MOUSEMSG msg;
 				Human h;
-				_playgame(fc, &h, &h); // Íæ¼ÒÓëÍæ¼Ò¶Ô¿¹
+				_playgame(fc, &h, &h); // ç©å®¶ä¸ç©å®¶å¯¹æŠ—
 				break;
 			} // case 1
-			case 2: { // AI×ÔÎÒ¶ÔŞÄ
-				// ÎªÁË¸øAI¶Ô¾ö¾¡¿ÉÄÜÔö¼ÓËæ»úĞÔ£¬ÎÒÃÇ¹Ì¶¨µÚÒ»¿Å×Ó·ÅÔÚÖĞÑë£¬µÚ¶ş¿Å×ÓËæ»ú·ÅÔÚÖĞÑëµÄÖÜÎ§
+			case 2: { // AIè‡ªæˆ‘å¯¹å¼ˆ
+				// ä¸ºäº†ç»™AIå¯¹å†³å°½å¯èƒ½å¢åŠ éšæœºæ€§ï¼Œæˆ‘ä»¬å›ºå®šç¬¬ä¸€é¢—å­æ”¾åœ¨ä¸­å¤®ï¼Œç¬¬äºŒé¢—å­éšæœºæ”¾åœ¨ä¸­å¤®çš„å‘¨å›´
 				Five_Chess fc;
 				char ch = ' ';
 				Search_AI ai;
-				SYSTEMTIME time; // ÒÔµ±Ç°µÄÊ±¼ä×÷Îª¾ö¶¨µÚ¶ş¿Å×ÓµÄÂä×ÓÎ»ÖÃ
+				SYSTEMTIME time; // ä»¥å½“å‰çš„æ—¶é—´ä½œä¸ºå†³å®šç¬¬äºŒé¢—å­çš„è½å­ä½ç½®
 				GetLocalTime(&time);
 				fc.putchess(7, 7);
 				printboard(fc);
 				int _x = time.wMilliseconds % 3 - 1, _y = (time.wMilliseconds / 3) % 3 - 1;
-				if(_x == 0 && _y == 0) ++_y; // ²»ÄÜÈÃÁ½¿Å×ÓÖØµş
+				if(_x == 0 && _y == 0) ++_y; // ä¸èƒ½è®©ä¸¤é¢—å­é‡å 
 				Sleep(500); 
 				fc.putchess(7 + _x, 7 + _y);
 				printboard(fc);
@@ -122,17 +124,17 @@ int WINAPI WinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrev, _In_ LPSTR cm
 				_playgame(fc, &ai, &ai, false);
 				break;
 			} // case 2
-			case 3: { // Ñ¡Ïî
+			case 3: { // é€‰é¡¹
 				options();
 				break;
 			}
-			case 4: { // ÍË³ö
+			case 4: { // é€€å‡º
 				closegraph();
 				return 0;
 			}
-#ifdef _DEBUG // ÔÚDEBUGÄ£Ê½ÏÂ×óÏÂ½Ç»áÓĞ¡°´ò¿ª±àÒëÆ÷½øĞĞDEBUG¡±µÄÑ¡Ïî£¬µã»÷»áÆô¶¯ÎÒµÄ±¾µØÎÄ¼ş£¬´Ó¶ø·½±ãÎÒ½øĞĞDEBUG
+#ifdef _DEBUG // åœ¨DEBUGæ¨¡å¼ä¸‹å·¦ä¸‹è§’ä¼šæœ‰â€œæ‰“å¼€ç¼–è¯‘å™¨è¿›è¡ŒDEBUGâ€çš„é€‰é¡¹ï¼Œç‚¹å‡»ä¼šå¯åŠ¨æˆ‘çš„æœ¬åœ°æ–‡ä»¶ï¼Œä»è€Œæ–¹ä¾¿æˆ‘è¿›è¡ŒDEBUG
 			case 5: {
-				ShellExecute(nullptr, _T("open"), _T("D:/ÎÄµµ/Visual Studio 2022/C++/Five_Chess"), 0, 0, SW_SHOWNORMAL);
+				ShellExecute(nullptr, _T("open"), _T("D:/æ–‡æ¡£/Visual Studio 2022/C++/Five_Chess"), 0, 0, SW_SHOWNORMAL);
 				closegraph();
 				return 0;
 			}
