@@ -6,4 +6,4 @@ Curriculum_Design-Project-Five_Chess-AI
 
 ------------
 
-[Project/37]R$QY[XK63)4PC1`@3NPO.png]
+[Project/Lose.png]
