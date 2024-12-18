@@ -6,4 +6,4 @@ Curriculum_Design-Project-Five_Chess-AI
 
 ------------
 
-![](Project/Lost.png)
+![输麻了](Project/Lost.png)
