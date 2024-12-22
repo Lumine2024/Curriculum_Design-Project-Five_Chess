@@ -9,11 +9,10 @@
 #pragma push_macro("msvc")
 #pragma push_macro("noinline")
 #pragma push_macro("always_inline")
-#pragma push_macro("inline")
 #undef msvc
 #undef noinline
 #undef always_inline
-// 在release模式下，将部分函数声明为inline，以减少函数调用开销
+// 鍦╮elease妯″紡涓嬶紝灏嗛儴鍒嗗嚱鏁板０鏄庝负inline锛屼互鍑忓皯鍑芥暟璋冪敤寮�閿�
 #ifndef RELEASE_INLINE
 #ifdef _DEBUG
 #define RELEASE_INLINE [[msvc::noinline]]
