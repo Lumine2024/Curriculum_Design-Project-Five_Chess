@@ -1,23 +1,30 @@
 #pragma once
-#include<Windows.h>
-#include<graphics.h>
-#include"Game Logic.h"
-// 被占据时丢出的异常类
+#include "Common.h"
+#include "Game Logic.h"
+#include <graphics.h>
+// 语言的枚举类
+enum Language {
+	Chinese = 0,
+	English = 1
+};
+// 所有的全局变量放在头文件中都需要extern
+extern Language language;
+// 打印提示信息
+RELEASE_INLINE void printhint(int x, int y, const TCHAR *str);
+// 被占据时抛出的异常类
 class Occupied {
 public:
 	// 构造时发出提示
-	Occupied();
+	Occupied() noexcept;
 };
 // 初始化操作
-void init();
+void init() noexcept;
 // 初始菜单
-int menu();
+int menu() noexcept;
 const MOUSEMSG no_msg = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // 鼠标在左上角的鼠标消息
 // 显示棋盘
-void printboard(const Five_Chess &game, const MOUSEMSG& msg = no_msg);
-// 人类操作落子
-void putchess(Five_Chess &game, MOUSEMSG& msg);
+void printboard(const Five_Chess &game, const MOUSEMSG &msg = no_msg) noexcept;
 // 选项界面
-void options();
+void options() noexcept;
 // 选边
-int side();
+int side() noexcept;

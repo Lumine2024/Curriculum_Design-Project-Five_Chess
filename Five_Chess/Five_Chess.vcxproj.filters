@@ -15,31 +15,54 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Project\source code\Game Logic.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Project\source code\Graphics Logic.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="..\Project\source code\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="..\Project\source code\Search_AI.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\Project\source code\Game Logic.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Project\source code\Graphics Logic.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Project\source code\Game Logic.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Project\source code\Graphics Logic.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="..\Project\source code\Player_base.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\Project\source code\Search_AI.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\Project\source code\Game Logic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Project\source code\Graphics Logic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Project\source code\Common.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="log.txt">
+      <Filter>资源文件</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\Project\resources\FIveChess.mp3">
+      <Filter>资源文件</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Project\resources\五子棋.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource_setting.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

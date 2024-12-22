@@ -1,7 +1,18 @@
-#include"Graphics Logic.h"
+#define _CRT_SECURE_NO_WARNINGS
+#include "Graphics Logic.h"
+#include "mmsystem.h"
+#include <string>
+#pragma comment(lib,"winmm.lib")
 using namespace std;
 
-void init() {
+Language language;
+
+void init() noexcept {
+	language = Chinese;
+	// 播放BGM
+	mciSendString(_T("open ../resources/FiveChess.mp3 alias bgm"), NULL, 0, NULL);
+	mciSendString(_T("play bgm repeat"), NULL, 0, NULL);
+	// 初始化图形界面
 	initgraph(680, 680);
 	setbkcolor(RGB(255, 255, 255));
 	setlinecolor(BLACK);
@@ -9,16 +20,33 @@ void init() {
 	BeginBatchDraw();
 }
 
-Occupied::Occupied() {
-	settextstyle(50, 0, _T("良怀行书"));
+RELEASE_INLINE void printhint(int x, int y, const TCHAR *str) {
+	if(language == Chinese) {
+		settextstyle(50, 0, _T("良怀行书"));
+	}
+	else {
+		settextstyle(25, 0, _T("Consolas"));
+	}
 	settextcolor(RED);
-	outtextxy(50, 275, _T("该位置已被占用，请重新选择！"));
+	int strlen = textwidth(str);
+	int strhight = textheight(str);
+	int countx = x - (strlen / 2);
+	int county = y - (strhight / 2);
+	outtextxy(countx, county, str);
+}
+
+const vector<tstring> Occupied_texts = {
+	_T("该位置已被占用，请重新选择！"),
+	_T("The position has been occupied, please choose again!")
+};
+
+Occupied::Occupied() noexcept {
+	printhint(340, 220, Occupied_texts[static_cast<size_t>(language)].c_str());
 	FlushBatchDraw();
 	Sleep(500);
 }
 
-
-void printboard(const Five_Chess &game, const MOUSEMSG &msg) {
+void printboard(const Five_Chess &game, const MOUSEMSG &msg) noexcept {
 	cleardevice();
 	// 画空棋盘
 	setlinecolor(BLACK);
@@ -50,22 +78,22 @@ void printboard(const Five_Chess &game, const MOUSEMSG &msg) {
 	if(_x >= 0 && _x < 15 && _y >= 0 && _y < 15 && game.chessboard[_x][_y] == ' ') {
 		int x = 50 + _x * 40;
 		int y = 50 + _y * 40;
-		if(game.is_index_0_player_playing) setfillcolor(LIGHTGRAY);
+		if(game.white_player_playing) setfillcolor(LIGHTGRAY);
 		else setfillcolor(DARKGRAY);
 		solidcircle(x, y, 15);
 	}
 	FlushBatchDraw();
 }
-// 按钮类
+
+// 按钮类，由于并不需要在图像以外的文件内使用，所以不放在Graphics Logic.h中
 class Button {
-private:
-	int x, y, width, height;
-	TCHAR *text;
 public:
 	// 构造函数
-	Button(int x, int y, int width, int height, const TCHAR *text) : x(x), y(y), width(width), height(height), text((TCHAR*)(text)) {}
+	Button(int x, int y, int width, int height, const TCHAR *text) noexcept : x(x), y(y), width(width), height(height) {
+		_tcscpy(this->text, text);
+	}
 	// 绘制按钮
-	void draw(MOUSEMSG &msg) {
+	void draw(MOUSEMSG &msg) const noexcept {
 		if(msg.x >= x && msg.x <= x + width && msg.y >= y && msg.y <= y + height) {
 			setfillcolor(RGB(233, 233, 233));
 			setbkcolor(RGB(233, 233, 233));
@@ -75,10 +103,16 @@ public:
 			setbkcolor(RGB(188, 188, 188));
 		}
 		fillrectangle(x, y, x + width, y + height);
-		settextstyle(20, 0, _T("黑体"));
+		if(language == Chinese) {
+			settextstyle(20, 0, _T("黑体"));
+		}
+		else {
+			settextstyle(20, 0, _T("Consolas"));
+		}
 		settextcolor(RGB(0, 0, 0));
 		int textWidth = textwidth(text);
 		int textHeight = textheight(text);
+		// 保证文字居中
 		int textX = x + (width - textWidth) / 2;
 		int textY = y + (height - textHeight) / 2;
 		outtextxy(textX, textY, text);
@@ -88,58 +122,91 @@ public:
 	bool isClicked(MOUSEMSG &msg) const noexcept {
 		return msg.x >= x && msg.x <= x + width && msg.y >= y && msg.y <= y + height && msg.uMsg == WM_LBUTTONDOWN;
 	}
+private:
+	int x, y, width, height;
+	TCHAR text[100];
 };
-// 多个按钮，fn为需要执行的其他命令，如打印标题
-template<class Function> int multibutton(vector<Button> &buttons, Function fn) {
+// 多个按钮，fn为需要执行的其他命令，如打印标题，返回被点击的按钮的下标
+template<class Function> int multibutton(const vector<Button> &buttons, Function fn) noexcept {
 	MOUSEMSG msg;
-	BeginBatchDraw();
 	while(true) {
-		if(MouseHit()) {
-			msg = GetMouseMsg();
-			cleardevice();
-			fn();
-			for(int i = 0; i < buttons.size(); ++i) {
-				buttons[i].draw(msg);
-				if(buttons[i].isClicked(msg)) {
-					EndBatchDraw();
-					return i;
-				}
+		msg = GetMouseMsg();
+		cleardevice();
+		fn();
+		for(int i = 0; i < buttons.size(); ++i) {
+			buttons[i].draw(msg);
+			if(buttons[i].isClicked(msg)) {
+				return i;
 			}
-			FlushBatchDraw();
 		}
+		FlushBatchDraw();
 		Sleep(4);
 	}
 }
-
-int menu() {
-	vector<Button> buttons = {
-		Button(280, 250, 120, 50, _T("单人游戏")),
-		Button(280, 320, 120, 50, _T("双人游戏")),
-		Button(280, 390, 120, 50, _T("AI自动战斗")),
-		Button(280, 460, 120, 50, _T("选项")),
-		Button(280, 530, 120, 50, _T("退出游戏"))
-	#ifdef _DEBUG
-		,Button(50, 600, 200, 50, _T("打开工程文件debug")) // 仅在DEBUG模式下生效
-	#endif
-	};
-	return multibutton(buttons, []() {
-		settextcolor(RGB(0, 0, 0));
+RELEASE_INLINE void printmenu(int x, int y, const TCHAR *str) {
+	settextcolor(RGB(0, 0, 0));
+	if(language == Chinese) {
 		settextstyle(50, 0, _T("黑体"));
-		outtextxy(280, 100, _T("五子棋"));
+	}
+	else {
+		settextstyle(50, 0, _T("Consolas"));
+	}
+	auto strlen = textwidth(str);
+	auto strhight = textheight(str);
+	int countx = x - (strlen / 2);
+	int county = y - (strhight / 2);
+	outtextxy(countx, county, str);
+}
+
+const vector<tstring> Menu_buttons_texts = {
+	_T("单人游戏"),_T("Single player"),
+	_T("双人游戏"),_T("Two players"),
+	_T("AI自动战斗"),_T("AI auto fight"),
+	_T("选项"),_T("Options"),
+	_T("退出游戏"),_T("Exit game")
+#ifdef _DEBUG
+	,_T("打开工程文件debug"),_T("Open project file to debug")
+#endif
+};
+
+const vector<tstring> Menu_texts = {
+	_T("五子棋"),_T("Five Chess")
+};
+int menu() noexcept {
+	vector<Button> menu_buttons = {
+		Button(280, 250, 120, 50, Menu_buttons_texts[static_cast<size_t>(language)].c_str()),
+		Button(280, 320, 120, 50, Menu_buttons_texts[2 + static_cast<size_t>(language)].c_str()),
+		Button(280, 390, 120, 50, Menu_buttons_texts[4 + static_cast<size_t>(language)].c_str()),
+		Button(280, 460, 120, 50, Menu_buttons_texts[6 + static_cast<size_t>(language)].c_str()),
+		Button(280, 530, 120, 50, Menu_buttons_texts[8 + static_cast<size_t>(language)].c_str())
+		#ifdef _DEBUG
+		,Button(50, 600, 200, 50, Menu_buttons_texts[10 + static_cast<size_t>(language)].c_str()) // 仅在DEBUG模式下生效
+		#endif
+	};
+	return multibutton(menu_buttons, []() {
+		printmenu(340, 100, Menu_texts[language].c_str());
 	});
 }
+
 // 是否正在播放音乐
 bool music_playing = true;
-void options() {
-	vector<Button> buttons = {
-		Button(240, 300, 200, 50, _T("是否播放音乐")),
-		Button(240, 400, 200, 50, _T("返回"))
-	};
+const vector<tstring> Options_buttons_texts = {
+	_T("是否播放音乐"),_T("Whether to play music"),
+	_T("更换语言"),_T("Switch language"),
+	_T("返回"),_T("Return")
+};
+const vector<tstring> Options_texts = {
+	_T("选项"),_T("Options")
+};
+void options() noexcept {
 	while(true) {
-		int choice = multibutton(buttons, []() {
-			settextcolor(RGB(0, 0, 0));
-			settextstyle(50, 0, _T("黑体"));
-			outtextxy(300, 100, _T("选项"));
+		vector<Button> options_buttons = {
+			Button(240, 300, 200, 50, Options_buttons_texts[static_cast<size_t>(language)].c_str()),
+			Button(240, 400, 200, 50, Options_buttons_texts[2 + static_cast<size_t>(language)].c_str()),
+			Button(240, 500, 200, 50, Options_buttons_texts[4 + static_cast<size_t>(language)].c_str())
+		};
+		int choice = multibutton(options_buttons, []() {
+			printmenu(340, 100, Options_texts[static_cast<size_t>(language)].c_str());
 		});
 		if(choice == 0) {
 			music_playing = !music_playing;
@@ -150,29 +217,28 @@ void options() {
 				mciSendString(_T("stop bgm"), NULL, 0, NULL);
 			}
 		}
+		else if(choice == 1) {
+			language = static_cast<Language>((static_cast<int>(language) + 1) % 2);
+		}
 		else return;
 	}
 }
 
-int side() {
-	vector<Button> buttons = {
-		Button(240, 250, 200, 50, _T("黑子")),
-		Button(240, 350, 200, 50, _T("白子")),
-		Button(240, 450, 200, 50, _T("返回"))
+const vector<tstring> Side_buttons_texts = {
+	_T("黑子"),_T("I choose black"),
+	_T("白子"),_T("I choose white"),
+	_T("返回"),_T("Return")
+};
+const vector<tstring> Side_texts = {
+	_T("选择方向"),_T("Choose your side")
+};
+int side() noexcept {
+	vector<Button> side_buttons = {
+		Button(240, 250, 200, 50, Side_buttons_texts[static_cast<size_t>(language)].c_str()),
+		Button(240, 350, 200, 50, Side_buttons_texts[2 + static_cast<size_t>(language)].c_str()),
+		Button(240, 450, 200, 50, Side_buttons_texts[4 + static_cast<size_t>(language)].c_str())
 	};
-	return (multibutton(buttons, []() {
-		settextcolor(RGB(0, 0, 0));
-		settextstyle(50, 0, _T("黑体"));
-		outtextxy(240, 100, _T("选择方向"));
+	return (multibutton(side_buttons, []() {
+		printmenu(340, 100, Side_texts[static_cast<size_t>(language)].c_str());
 	}));
-}
-
-void putchess(Five_Chess &game, MOUSEMSG &msg) {
-	// 把鼠标消息转换为棋盘坐标
-	int x = (msg.x - 25) / 40;
-	int y = (msg.y - 25) / 40;
-	// 如果在棋盘内则落子，可能抛出异常Occupied，此时需要在外部处理
-	if(msg.uMsg == WM_LBUTTONDOWN && x < 15 && y < 15) {
-		game.putchess(x, y);
-	}
 }

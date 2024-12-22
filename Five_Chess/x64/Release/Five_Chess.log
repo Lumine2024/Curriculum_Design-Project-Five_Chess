@@ -1,8 +1,9 @@
-﻿  main.cpp
-D:\文档\Visual Studio 2022\C++\Five_Chess\Project\source code\main.cpp(35,20): warning C4101: “oc”: 未引用的局部变量
-D:\文档\Visual Studio 2022\C++\Five_Chess\Project\source code\main.cpp(102,14): warning C4101: “msg”: 未引用的局部变量
+﻿  Game Logic.cpp
+  Graphics Logic.cpp
+  Search_AI.cpp
+  main.cpp
   正在生成代码
-  0 of 538 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  0 of 620 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
