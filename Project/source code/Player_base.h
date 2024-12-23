@@ -5,8 +5,8 @@ class Five_Chess;
 class Player_Base {
 public:
 	// ÅÐ¶ÏÆåÅÌ¾ÖÊÆ
-	virtual void judge(const Five_Chess &fc) noexcept = 0;
+	virtual void	judge(const Five_Chess &fc) noexcept	= 0;
 	// Âä×Ó
-	virtual void put(Five_Chess &fc) noexcept = 0;
-	virtual ~Player_Base() = default;
+	virtual void	put(Five_Chess &fc) noexcept			= 0;
+	virtual			~Player_Base()							= default;
 };

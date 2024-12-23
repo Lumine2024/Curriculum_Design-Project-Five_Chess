@@ -8,6 +8,10 @@ RELEASE_INLINE void Five_Chess::putchess(int x, int y) {
 	if(chessboard[x][y] == ' ') {
 		chessboard[x][y] = white_player_playing ? '1' : '2';
 		white_player_playing = !white_player_playing;
+		prev_lastx = lastx;
+		prev_lasty = lasty;
+		lastx = x;
+		lasty = y;
 	}
 	// 被占据，抛异常
 	else {
@@ -19,21 +23,18 @@ RELEASE_INLINE void Five_Chess::rmchess(int x, int y) noexcept {
 	// 不检测了
 	chessboard[x][y] = ' ';
 	white_player_playing = !white_player_playing;
+	lastx = prev_lastx;
+	lasty = prev_lasty;
 }
 
 RELEASE_INLINE bool Five_Chess::has_ended(char &ch) const noexcept {
-	// 棋盘占满，游戏结束
-	if(generate_possible_moves().empty()) {
-		ch = '3';
-		return true;
-	}
 	// 五子连珠，游戏结束
 	for(int i = 0; i < 15; ++i) {
 		for(int j = 0; j < 11; ++j) {
-			if(chessboard[i][j] == chessboard[i][j + 1] &&
-				chessboard[i][j + 1] == chessboard[i][j + 2] &&
-				chessboard[i][j + 2] == chessboard[i][j + 3] &&
-				chessboard[i][j + 3] == chessboard[i][j + 4] &&
+			if(chessboard[i][j]			== chessboard[i][j + 1] &&
+				chessboard[i][j + 1]	== chessboard[i][j + 2] &&
+				chessboard[i][j + 2]	== chessboard[i][j + 3] &&
+				chessboard[i][j + 3]	== chessboard[i][j + 4] &&
 				chessboard[i][j] != ' ') {
 				ch = chessboard[i][j];
 				return true;
@@ -42,10 +43,10 @@ RELEASE_INLINE bool Five_Chess::has_ended(char &ch) const noexcept {
 	}
 	for(int i = 0; i < 15; ++i) {
 		for(int j = 0; j < 11; ++j) {
-			if(chessboard[j][i] == chessboard[j + 1][i] &&
-				chessboard[j + 1][i] == chessboard[j + 2][i] &&
-				chessboard[j + 2][i] == chessboard[j + 3][i] &&
-				chessboard[j + 3][i] == chessboard[j + 4][i] &&
+			if(chessboard[j][i]			== chessboard[j + 1][i] &&
+				chessboard[j + 1][i]	== chessboard[j + 2][i] &&
+				chessboard[j + 2][i]	== chessboard[j + 3][i] &&
+				chessboard[j + 3][i]	== chessboard[j + 4][i] &&
 				chessboard[j][i] != ' ') {
 				ch = chessboard[j][i];
 				return true;
@@ -54,10 +55,10 @@ RELEASE_INLINE bool Five_Chess::has_ended(char &ch) const noexcept {
 	}
 	for(int i = 0; i < 11; ++i) {
 		for(int j = 0; j < 11; ++j) {
-			if(chessboard[i][j] == chessboard[i + 1][j + 1] &&
-				chessboard[i + 1][j + 1] == chessboard[i + 2][j + 2] &&
-				chessboard[i + 2][j + 2] == chessboard[i + 3][j + 3] &&
-				chessboard[i + 3][j + 3] == chessboard[i + 4][j + 4] &&
+			if(chessboard[i][j]				== chessboard[i + 1][j + 1] &&
+				chessboard[i + 1][j + 1]	== chessboard[i + 2][j + 2] &&
+				chessboard[i + 2][j + 2]	== chessboard[i + 3][j + 3] &&
+				chessboard[i + 3][j + 3]	== chessboard[i + 4][j + 4] &&
 				chessboard[i][j] != ' ') {
 				ch = chessboard[i][j];
 				return true;
@@ -66,15 +67,20 @@ RELEASE_INLINE bool Five_Chess::has_ended(char &ch) const noexcept {
 	}
 	for(int i = 4; i < 15; ++i) {
 		for(int j = 0; j < 11; ++j) {
-			if(chessboard[i][j] == chessboard[i - 1][j + 1] &&
-				chessboard[i - 1][j + 1] == chessboard[i - 2][j + 2] &&
-				chessboard[i - 2][j + 2] == chessboard[i - 3][j + 3] &&
-				chessboard[i - 3][j + 3] == chessboard[i - 4][j + 4] &&
+			if(chessboard[i][j]				== chessboard[i - 1][j + 1] &&
+				chessboard[i - 1][j + 1]	== chessboard[i - 2][j + 2] &&
+				chessboard[i - 2][j + 2]	== chessboard[i - 3][j + 3] &&
+				chessboard[i - 3][j + 3]	== chessboard[i - 4][j + 4] &&
 				chessboard[i][j] != ' ') {
 				ch = chessboard[i][j];
 				return true;
 			}
 		}
+	}
+	// 棋盘占满，游戏结束
+	if(generate_possible_moves().empty()) {
+		ch = '3';
+		return true;
 	}
 	// 未结束，返回假
 	ch = ' ';
@@ -94,7 +100,7 @@ RELEASE_INLINE vector<pair<int, int>> Five_Chess::generate_possible_moves() cons
 	return moves;
 }
 
-void playgame(Five_Chess &fc,
+RELEASE_INLINE void playgame(Five_Chess &fc,
 	Player_Base *player1, Player_Base *player2,
 	bool dosleep) noexcept {
 	// 进入游戏时打印棋盘
@@ -129,7 +135,7 @@ void playgame(Five_Chess &fc,
 	setlinecolor(BLACK);
 }
 
-void Human::put(Five_Chess &fc) noexcept {
+RELEASE_INLINE void Human::put(Five_Chess &fc) noexcept {
 	while(true) {
 		// 获取鼠标信息
 		MOUSEMSG msg = GetMouseMsg();
