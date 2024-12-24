@@ -9,7 +9,6 @@
 #pragma push_macro("msvc")
 #pragma push_macro("noinline")
 #pragma push_macro("always_inline")
-#pragma push_macro("inline")
 #undef msvc
 #undef noinline
 #undef always_inline

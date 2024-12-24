@@ -9,7 +9,7 @@ constexpr char separator[] = "--------------------------------------------------
 using namespace std;
 #pragma warning(disable: 4244) // double转score_t可能会有精度损失，但是这里不需要精度
 
-constexpr Search_AI::score_t score_ref[5] = { 1, 100, 100000, 100000000ULL, 10000000000000ULL }; // 棋盘类型对应的得分估值函数
+constexpr Search_AI::score_t score_ref[5] = { 1, 100, 100000, 100000000ULL, 10000000000000ULL }; // 棋盘类型对应的得分估值数组
 constexpr int directions[4][2] = { {1, 0}, {0, 1}, {1, 1}, {1, -1} }; // 方向数组
 void Search_AI::judge(const Five_Chess &fc) noexcept {
 	judgement = vector<vector<score_t>>(15, vector<score_t>(15, 0)); // 初始化判断

@@ -1,2 +1,2 @@
-Language: Chinese
+Language: English
 Music: On

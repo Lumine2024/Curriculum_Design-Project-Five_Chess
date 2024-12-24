@@ -8,12 +8,6 @@
 // 五子棋棋盘类
 class Five_Chess {
 public:
-	// 棋盘
-	std::vector<std::vector<char>> chessboard;
-	// 是否为白子正在操作
-	bool white_player_playing;
-	int lastx, lasty;
-	int prev_lastx, prev_lasty;
 	Five_Chess() :
 		chessboard(15, std::vector<char>(15, ' ')),
 		white_player_playing(false),
@@ -36,17 +30,25 @@ public:
 		return *this;
 	}
 	// 落子
-	RELEASE_INLINE void putchess	(int x, int y);
-	// 移除棋子，请自行设置lastx和lasty
-	RELEASE_INLINE void rmchess		(int x, int y) noexcept;
+	RELEASE_INLINE void								putchess	(int x, int y);
+	// 移除棋子
+	RELEASE_INLINE void								rmchess		(int x, int y) noexcept;
 	// 判定游戏是否结束，ch传入以获取胜利玩家
-	RELEASE_INLINE bool has_ended	(char &ch) const noexcept;
+	RELEASE_INLINE bool								has_ended	(char &ch) const noexcept;
 	// 生成所有可能的落子处
 	RELEASE_INLINE std::vector<std::pair<int, int>> generate_possible_moves() const noexcept;
 	// 返回正在玩的玩家，true为白子
-	RELEASE_INLINE bool player_playing() const noexcept {
+	RELEASE_INLINE bool								player_playing() const noexcept {
 		return white_player_playing;
 	}
+	// 棋盘
+	std::vector<std::vector<char>>	chessboard;
+	// 是否为白子正在操作
+	bool							white_player_playing;
+	// 最后一次落子的位置
+	int								lastx, lasty;
+	// 上一次落子的位置
+	int								prev_lastx, prev_lasty;
 };
 
 // 进行游戏的函数
@@ -62,5 +64,5 @@ public:
 	// 人类的判断可由人类自行完成，故提供空实现
 	RELEASE_INLINE void judge(const Five_Chess &fc) noexcept override {}
 	// 获取鼠标信息，点击时落子
-	RELEASE_INLINE void put(Five_Chess &fc) noexcept override;
+	RELEASE_INLINE void put(Five_Chess &fc)			noexcept override;
 };

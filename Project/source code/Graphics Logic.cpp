@@ -22,9 +22,9 @@ RELEASE_INLINE void init() noexcept {
 	cout.rdbuf(debuglog.rdbuf());
 #endif
 	// 播放BGM
-	mciSendString(_T("open ../resources/FiveChess.mp3 alias bgm"), NULL, 0, NULL);
+	mciSendString(_T("open ../resources/FiveChess.mp3 alias bgm"), nullptr, 0, nullptr);
 	if(music_playing) {
-		mciSendString(_T("play bgm repeat"), NULL, 0, NULL);
+		mciSendString(_T("play bgm repeat"), nullptr, 0, nullptr);
 	}
 	// 初始化图形界面
 	initgraph(680, 680);
@@ -53,7 +53,6 @@ const vector<tstring> Occupied_texts = {
 	_T("该位置已被占用，请重新选择！"),
 	_T("The position has been occupied, please choose again!")
 };
-
 RELEASE_INLINE Occupied::Occupied() noexcept {
 	printhint(340, 220, Occupied_texts[static_cast<size_t>(language)].c_str());
 	FlushBatchDraw();
@@ -67,8 +66,8 @@ RELEASE_INLINE void printboard(const Five_Chess &game, const MOUSEMSG &msg) noex
 	setlinecolor(BLACK);
 	for(int i = 0; i < 15; ++i) {
 		int offset = 50 + i * 40;
-		line(50,		offset, 610,	offset);
-		line(offset,	50,		offset, 610);
+		line(50,		offset,		610,		offset);
+		line(offset,	50,			offset,		610);
 	}
 	// 画棋子
 	for(int i = 0; i < 15; ++i) {
@@ -234,10 +233,10 @@ RELEASE_INLINE void options() noexcept {
 		if(choice == 0) {
 			music_playing = !music_playing;
 			if(music_playing) {
-				mciSendString(_T("play bgm repeat"), NULL, 0, NULL);
+				mciSendString(_T("play bgm repeat"), nullptr, 0, nullptr);
 			}
 			else {
-				mciSendString(_T("stop bgm"),		 NULL, 0, NULL);
+				mciSendString(_T("stop bgm"),		 nullptr, 0, nullptr);
 			}
 		}
 		else if(choice == 1) {
@@ -293,16 +292,16 @@ RELEASE_INLINE void writesettings() noexcept {
 	cout.rdbuf(settings.rdbuf());
 	cout << "Language: ";
 	if(language == Chinese) {
-		cout << "Chinese" << endl;
+		cout << "Chinese"	<< endl;
 	}
 	else {
-		cout << "English" << endl;
+		cout << "English"	<< endl;
 	}
 	cout << "Music: ";
 	if(music_playing) {
-		cout << "On" << endl;
+		cout << "On"		<< endl;
 	}
 	else {
-		cout << "Off" << endl;
+		cout << "Off"		<< endl;
 	}
 }
