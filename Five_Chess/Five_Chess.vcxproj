@@ -142,6 +142,7 @@
     <ClInclude Include="..\Project\source code\Search_AI.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\Project\settings\settings.txt" />
     <Text Include="log.txt" />
   </ItemGroup>
   <ItemGroup>
